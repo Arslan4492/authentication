@@ -4,11 +4,15 @@ import * as yup from "yup";
 import toast from "react-hot-toast";
 import { auth, createUserWithEmailAndPassword } from "../../../services/firebase-config";
 import axios from "axios";
+import { AppLoader } from "../../../components";
+import { useState } from "react";
 
 const Register = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const handleSubmit = async (values, setSubmitting) => {
     try {
+      setIsLoading(true);
       const { email, password } = values;
       const { user } = await createUserWithEmailAndPassword(auth, email, password);
       const { data } = await axios.post("http://localhost:4000/auth/register", {
@@ -18,9 +22,12 @@ const Register = () => {
       console.log("🚀 ~ file: index.jsx:15 ~ handleSubmit ~ data", data);
       setSubmitting(false);
       toast.success(data.message);
+      setIsLoading(false);
       navigate("/login");
     } catch (error) {
       setSubmitting(false);
+      setIsLoading(false);
+      toast.error(error.message);
       console.log("🚀 ~ file: index.jsx:15 ~ handleSubmit ~ error", error.message);
     }
   };
@@ -30,6 +37,7 @@ const Register = () => {
     password: yup.string().min(8).max(20).required(),
     email: yup.string().email().required(),
   });
+  if (isLoading) return <AppLoader />;
   return (
     <div className='flex min-h-screen w-full flex-wrap content-center justify-center bg-gray-200 py-10'>
       <div className='flex shadow-md'>

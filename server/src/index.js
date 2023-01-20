@@ -7,10 +7,10 @@ const express = require('express')
 const cors = require('cors')
 const bodyParse = require('body-parser')
 
-const app = express()
 const routes = require('./collections')
 const database = require('./database')
-const PORT = 4000
+const PORT = process.env.DB_CONNECTION || 4001
+const app = express()
 
 const NodeJsServer = async () => {
     try {

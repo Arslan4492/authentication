@@ -4,22 +4,28 @@ import * as yup from "yup";
 import { auth, signInWithEmailAndPassword } from "../../../services/firebase-config";
 import toast from "react-hot-toast";
 import axios from "axios";
+import { AppLoader } from "../../../components";
+import { useState } from "react";
 
 const Login = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const handleSubmit = async (values, setSubmitting) => {
     try {
+      setIsLoading(true);
       const { email, password } = values;
-      // await signInWithEmailAndPassword(auth, email, password);
+      await signInWithEmailAndPassword(auth, email, password);
       const { data } = await axios.post("http://localhost:4000/auth/login", { ...values });
-      console.log("🚀 ~ file: index.jsx:15 ~ handleSubmit ~ data", data);
       setSubmitting(false);
       toast.success(data.message);
       localStorage.setItem("tokenOfOurApp", data.token);
+      setIsLoading(false);
       navigate("/dashboard");
     } catch (error) {
-      setSubmitting(false);
       console.log("🚀 ~ file: index.jsx:15 ~ handleSubmit ~ error", error.message);
+      setSubmitting(false);
+      setIsLoading(false);
+      toast.error(error.message);
     }
   };
 
@@ -27,6 +33,8 @@ const Login = () => {
     password: yup.string().min(8).max(20).required(),
     email: yup.string().email().required(),
   });
+
+  if (isLoading) return <AppLoader />;
   return (
     <div className='flex min-h-screen w-full flex-wrap content-center justify-center bg-gray-200 py-10'>
       <div className='flex shadow-md'>
@@ -119,17 +127,13 @@ const Login = () => {
       <div className='mt-3 w-full'>
         <p className='text-center'>
           Made by{" "}
-          <a target='_blank' href='https://www.instagram.com/_inubayuaji/' className='text-purple-700'>
-            Inu Bayu Aji
-          </a>{" "}
-          and ispired by{" "}
-          <a
-            target='_blank'
-            href='https://dribbble.com/shots/17564792-Log-in-page-Untitled-UI'
-            className='text-purple-700'
-          >
-            this
-          </a>
+          <Link to='/login' className='text-purple-700'>
+            Arslan Ali
+          </Link>{" "}
+          and inspired by{" "}
+          <Link to='/login' className='text-purple-700'>
+            me
+          </Link>
           .
         </p>
       </div>
